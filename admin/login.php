@@ -9,7 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check credentials
     if ($username === 'khfdz' && $password === '123') {
         $_SESSION['loggedin'] = true;
-        header("Location: dashboard.php");
+        header("Location: admin_dashboard.php");
         exit();
     } else {
         $error = "Invalid username or password";
