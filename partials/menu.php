@@ -1,8 +1,4 @@
-<section id="menu" class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-4">Menu Kami</h2>
-        <form action="order.php" method="post">
-            <div class="row">
+
                 <!-- Item Menu 1 -->
                 <?php
 include 'db_connect.php';
@@ -53,8 +49,3 @@ mysqli_close($conn); // Close the database connection
 ?>
 
 
-            <!-- Button untuk Submit -->
-            <button type="submit" class="btn btn-primary">Pesan Sekarang</button>
-        </form>
-    </div>
-</section>

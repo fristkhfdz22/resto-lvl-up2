@@ -30,6 +30,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                     <a class="nav-link" href="admin_orders.php">Manage Orders</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="admin_panel.php">contact</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="logout.php">Logout</a>
                 </li>
             </ul>
