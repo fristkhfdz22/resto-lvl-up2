@@ -1,6 +1,6 @@
 /* Parallax effect for hero and about sections */
 .hero {
-    background: url('../images/hero-bg.jpg') no-repeat center center fixed;
+    background: url('../images/dinner-min.jpg') no-repeat center center fixed;
     background-size: cover;
     height: 100vh;
     display: flex;

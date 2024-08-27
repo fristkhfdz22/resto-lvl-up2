@@ -1,21 +1,26 @@
 <?php
+// Memulai sesi untuk melacak apakah admin telah login
 session_start();
+
+// Memeriksa apakah pengguna telah login; jika tidak, arahkan kembali ke halaman login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: login.php");
     exit();
 }
 
+// Menghubungkan ke database
 include __DIR__ . '/../db_connect.php';
 
-// Check if the item ID is provided
+// Memeriksa apakah ID item disediakan dan valid
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: admin_menu.php");
     exit();
 }
 
+// Mendapatkan ID item dari parameter URL
 $item_id = $_GET['id'];
 
-// Fetch the item details from the database
+// Mengambil detail item dari database berdasarkan ID
 $sql = "SELECT * FROM menu_items WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, 'i', $item_id);
@@ -23,32 +28,34 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $item = mysqli_fetch_assoc($result);
 
+// Jika item tidak ditemukan, kembali ke halaman kelola menu
 if (!$item) {
     header("Location: admin_menu.php");
     exit();
 }
 
-// Handle the form submission for updating the item
+// Menangani pengiriman form untuk memperbarui item
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Mendapatkan data yang dikirim dari form
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
     $image = $_FILES['image'];
 
-    // Update menu item details
+    // Memperbarui detail item di database
     $update_sql = "UPDATE menu_items SET name = ?, description = ?, price = ? WHERE id = ?";
     $stmt = mysqli_prepare($conn, $update_sql);
     mysqli_stmt_bind_param($stmt, 'ssdi', $name, $description, $price, $item_id);
     mysqli_stmt_execute($stmt);
 
-    // Handle image upload if a new image is provided
+    // Menangani unggahan gambar jika gambar baru disediakan
     if (!empty($image['name'])) {
         $target_dir = __DIR__ . '/../images/';
         $target_file = $target_dir . basename($image["name"]);
         $uploadOk = 1;
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-        // Validate the image file
+        // Validasi file gambar
         $check = getimagesize($image["tmp_name"]);
         if ($check === false) {
             echo "File is not an image.";
@@ -65,6 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $uploadOk = 0;
         }
 
+        // Jika file gambar valid, unggah file dan perbarui data gambar di database
         if ($uploadOk == 1) {
             if (move_uploaded_file($image["tmp_name"], $target_file)) {
                 $update_image_sql = "UPDATE menu_items SET image = ? WHERE id = ?";
@@ -77,6 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    // Setelah update, kembali ke halaman kelola menu
     header("Location: admin_menu.php");
     exit();
 }
@@ -91,6 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
+    <!-- Navbar untuk navigasi admin -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="#">Admin Dashboard</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,6 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <div class="container mt-4">
         <h1 class="mb-4">Edit Menu Item</h1>
+        <!-- Form untuk mengedit item menu -->
         <form action="edit_menu.php?id=<?php echo $item_id; ?>" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="name">Name:</label>
@@ -127,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="number" step="0.01" id="price" name="price" class="form-control" value="<?php echo htmlspecialchars($item['price']); ?>" required>
             </div>
 
-            <!-- Display current image if exists -->
+            <!-- Menampilkan gambar saat ini jika ada -->
             <div class="form-group">
                 <label for="image">Image (Leave empty if not changing):</label><br>
                 <?php if ($item['image']): ?>
@@ -150,5 +161,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </html>
 
 <?php
-mysqli_close($conn); // Close the database connection
+mysqli_close($conn); // Menutup koneksi database
 ?>
